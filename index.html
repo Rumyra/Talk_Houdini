@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Ruth's talk about CSS Houdini">
+	<title>CSS Houdini</title>
+
+	<link rel="stylesheet" type="text/css" href="reveal.js-3.8.0/css/reveal.css">
+	<link rel="stylesheet" href="reveal.js-3.8.0/css/theme/rumyra.css" id="theme">
+	<link rel="stylesheet" href="reveal.js-3.8.0/lib/css/zenburn.css">
+
+	<style type="text/css">
+		/* these are really just here for reference but yeh cool 	*/
+		:root {
+			--purple: hsla(273, 36%, 64%, 1);
+			--pink: hsla(346, 63%, 64%, 1);
+			--orange: hsla(5, 74%, 67%, 1);
+			--green: hsla(131, 30%, 63%, 1);
+			--blue: hsla(179, 38%, 58%, 1);
+		}
+
+		.reveal {
+			--mainColour: var(--purple);
+			background-image: paint(dots);
+		}
+
+		.button {
+			--unit: 1.2rem;
+			display: block; margin: 0 auto;
+			padding: var(--unit) calc(var(--unit)*2);
+			width: calc(30% + 20px);
+			background: var(--mainColour) linear-gradient(180deg, var(--mainColour), var(--lighterMain)) no-repeat left top;
+			background-position: 0% 0%;
+			border: 4px solid var(--mainColour);
+			border-radius: 2px;
+
+			font-size: calc(var(--unit)*2); color: var(--white);
+			/*font-family: "zillaslab", serif;*/
+
+			cursor: pointer;
+			transform: scale(0.95);
+		}
+
+		.button:hover {
+			background: var(--white) linear-gradient(180deg, transparent, transparent) no-repeat top left;
+			color: var(--mainColour);
+			border-color: var(--mainColour);
+			transform: scale(1);
+		}
+
+	</style>
+
+</head>
+<body>
+
+	<!-- TALK +++++++++++++++++++++++++++++++++ -->
+	<div class="reveal">
+		<div class="slides">
+			<section class="dark" data-background-color="hsla(315, 3%, 25%, 1)">
+				<h1>CSS Houdini</h1>
+				<h2>Ruth John&nbsp;&nbsp;|&nbsp;&nbsp;@rumyra</h2>
+			</section>
+
+			<section class="purple" data-state="purple">
+				<h1>Hello</h1>
+				<h2>I'm Ruth&nbsp;&nbsp;|&nbsp;&nbsp;@rumyra</h2>
+				<h2><b class="fragment">👩🏻‍💻</b>&nbsp;&nbsp;&nbsp;<b class="fragment">🎙</b>&nbsp;&nbsp;&nbsp;<b class="fragment">🎓</b></h2>
+
+				<aside class="notes">
+					<p>ctrl-i dev tools - paint worklet in sublime</p>
+					<p>Hi everyone, quick intro - I'm Ruth. You can find me on everything as @rumyra</p>
+					<p>I'm a creative dev, I run a podcast, I teach</p>
+				</aside>
+			</section>
+
+			<section class="purple">
+				<h1 class="purple">CSS Houdini</h1>
+				<h2>🧚🏻‍♀️&nbsp;✨</h2>
+
+				<aside class="notes">
+					<p>So today, we're going to have a lesson on CSS Houdini. Back in the spring I helped write some demos for MDN docs, so I'm going to share with you what I learnt whilst doing this.</p>
+				</aside>
+			</section>
+
+			<section class="purple">
+				<h1>What is Houdini?</h1>
+				<h2 class="fragment">Suite of APIs</h2>
+				<h2 class="fragment">Extend CSS through JS</h2>
+
+				<aside class="notes">
+					<p>Houdini is basically just a buzz word. Someone came up with it and it stuck, because there's a whole bunch of apis that are being drafted and written, which allow us as developers better access to CSS, through javascript, an Houdini is the word that describes all of them together</p>
+					<p>At the moment, if a new feature comes out in CSS, say conic gradient, as we see with new features, it may take some time for those features to be implemented by browsers, polyfills as they stand are cumbersome and unperformant, and so Houdini looks to solve this problem.</p>
+					<p>It is not, and I say this strongly, a new shiny css thing we are going to polyfill.</p>
+					<p>Let's take a look at the api's currently under the suite of Houdini.</p>
+				</aside>
+			</section>
+
+			<section class="lists purple">
+				<div class="list-left">
+					<ul>
+						<li><h3>Typed OM</h3></li>
+						<li class="fragment"><h3>CSS Paint API</h3></li>
+						<li class="fragment"><h3>Properties & Values</h3></li>
+						<li class="fragment"><h3>Layout API</h3></li>
+						<li class="fragment"><h3>Animation Worklet</h3></li>
+					</ul>
+				</div>
+				<aside class="notes">
+					<p>So there's Typed OM, Pant API, Properties & Values, Layout API and Animation Worklet. This is what I'm going to be talking about today</p>
+					<p>Today I am going to deep dive into Typed OM and Paint, and discuss Properties & vlues, Layout and animation.</p>
+					<p>I'll show you why</p>
+					<p>So let's start from the top - with probably what I deem to be the most important - Typed OM.</p>
+				</aside>
+			</section>
+
+			<section class="purple" data-state="purple">
+				<p><a data-preview-link href="https://ishoudinireadyyet.com/">https://ishoudinireadyyet.com/</a></p>
+				<aside class="notes">
+					<p>This is the support for CSS Houdini as it stands at the time of this talk.</p>
+					<p>I've omitted parser & font metrics</p>
+					<p>Talk about each api</p>
+					<p>So let's start from the top - with probably what I deem to be the most important - Typed OM.</p>
+				</aside>
+			</section>
+
+			<section class="blue" data-state="blue">
+				<h1 class="blue">Typed OM</h1>
+				<h2>Access to CSS Values as types in JS</h2>
+
+				<aside class="notes">
+					<p>This pretty much underpins all the other APIs, standalone its very verbose and can seem cumbersome as I'm just about to take you through it</p>
+					<p>To sum it up</p>
+					<p>Now the easiest way for me to explain this is to shwo you how we access styles in js at the moment</p>
+				</aside>
+			</section>
+
+			<section class="blue">
+				<button class="button">Click Me</button>
+				<pre><code data-trim data-noescape>button {
+	border-width: 4px;
+}</code></pre>
+				<aside class="notes">
+					<p>Just a little bit of syntax before we move on. Selectors, properties, values.</p>
+				</aside>
+			</section>
+
+			<section data-state="style" class="blue">
+				<button class="button">Click Me</button>
+				<pre><code data-trim data-noescape>const borderWidth = buttonEl.style.borderWidth; // "4px"
+
+buttonEl.style.borderWidth = "2px";</code></pre>
+				<aside class="notes">
+					<p>I mean if we wanted to compute the new border value, we have to do some weird string thing where we count back from the string because there could be any number of numebrs at the beginning, and that's because we're sure it's pixels and not some other unit, like rem, and then we gotta do the math and string it bac together and it's 2020.</p>
+					<p>Wouldn't it be cool if we could do something like this:</p>
+				</aside>
+			</section>
+
+			<section data-state="typed" class="blue">
+				<button class="button">Click Me</button>
+				<pre><code data-trim data-noescape>buttonEl.computedStyleMap() // returns all css!
+
+const borderWidth = buttonEl.computedStyleMap().get('border-top-width');
+
+// Returns: value: 4, unit: "px"
+</code></pre>
+				<aside class="notes">
+					<p>And that returns an object with a value and a unit. And that value is a number.</p>
+					<p>computed style map returns all css</p>
+					<p>There's lots of these value types - this is the idea behind typed om, that eventually all values in css will have a type - this border width is a CSSUnitValue - there's lots...</p>
+				</aside>
+			</section>
+
+			<section class="lists blue">
+				<div class="list-left">
+					<ul>
+						<li><code>CSSStyleValue</code></li>
+						<li class="fragment"><code>CSSKeywordValue</code></li>
+						<li class="fragment"><code>CSSNumericValue</code></li>
+						<li class="fragment"><code>CSSUnitValue</code></li>
+						<li class="fragment"><code>CSSMathSum</code></li>
+						<li class="fragment"><code>CSSTransformValue</code></li>
+						<li class="fragment"><code>CSSUnparsedValue</code></li>
+						<li class="fragment"><code>CSSVariableReferenceValue</code></li>
+					</ul>
+				</div>
+				<aside class="notes">
+					<p>CSSStyleValue is the parent class</p>
+					<p>keyword value so a word that's not a string, like inherit or auto, or block, inline</p>
+					<p>CSS Numeric value is the parent class for the unit value we just saw</p>
+					<p>CSS Unit value we just saw</p>
+					<p>CSS math sum is for when you use calc (min max) in css</p>
+					<p>transform</p>
+					<p>unparsed - variables and variablereference is for creating variable values</p>
+					<p>There's going to be more - css image value, css colour value</p>
+				</aside>
+			</section>
+
+			<section data-state="make" class="blue">
+				<button class="button" id="butt">Click Me</button>
+				<pre><code data-trim data-noescape>new CSSUnitValue(10, px);
+
+CSS.px(10);
+
+buttonEl.attributeStyleMap().set('border-top-width', CSS.px(10));
+</code></pre>
+				<aside class="notes">
+					<p>So we've seen how we get a CSS value affecting an element, but how to we set it.</p>
+					<p>We create the CSSStyleValue</p>
+					<p>Couple of ways - we can use the class constructor new - or the easier factory method of CSS.px (units)</p>
+					<p>we saw .style method earlier. In js as it stands at the moment we set values on the style attribute - this doesn't change but we have access to that via the styleAttributeMap - we can get stuff just like we did before</p>
+				</aside>
+			</section>
+
+			<section class="blue">
+				<button class="button" id="butt">Click Me</button>
+				<pre><code data-trim data-noescape>buttonEl.attributeStyleMap().get('border-top-width') // returns CSSUnitValue
+
+buttonEl.attributeStyleMap.has('border-top-width') // returns true
+
+buttonEl.attributeStyleMap.delete('border-top-width') // removes from attribute styles
+
+buttonEl.attributeStyleMap.clear() // removes all attribute styles
+</code></pre>
+				<aside class="notes">
+					<p>Couple of other methods on the sytleattrmap - get has delete clear</p>
+				</aside>
+			</section>
+
+			<section class="blue">
+				<h1>Numeric</h1>
+				<aside class="notes">
+					<p>Let's dive into some of the methods of the more complete types of the API</p>
+					<p>Numeric values</p>
+					<p>I'm not going to go into every single method, there's a lot going on. The CSS object comes with a whole bunch of stuff now.</p>
+					<p>I thought I would give you a sneaky peek of the docs, which are being edited by the absolutely wonderful Estelle Wyle as we speak.</p>
+					<p>3 & 4</p>
+					<p>Calc function, so we can create CSSMathSum val - but not only that, we also have a bunch of methods which allow us to do maths on the CSSNumericTypes types.</p>
+				</aside>
+			</section>
+
+			<section class="blue">
+				<h1>MathSum</h1>
+				<pre><code data-trim data-noescape>button {
+	width: calc( 20vw + 0.5em );
+}</code></pre>
+				<aside class="notes">
+					<p>Other parts of Typed OM which are pretty feature complete are maths and transforms</p>
+					<p>I'm not going to go into every single method, there's a lot going on. The CSS object comes with a whole bunch of stuff now.</p>
+					<p>I thought I would give you a sneaky peek of the docs, which are being edited by the absolutely wonderful Estelle Wyle as we speak.</p>
+					<p>3 & 4</p>
+					<p>Calc function, so we can create CSSMathSum val - but not only that, we also have a bunch of methods which allow us to do maths on the CSSNumericTypes types.</p>
+				</aside>
+			</section>
+
+			<section class="blue" data-state="blue">
+				<h1>Transform</h1>
+				<pre><code data-trim data-noescape>button {
+	transform: translateX(10px) rotate(45deg) scale(0.5);
+}</code></pre>
+				<aside class="notes">
+					<p>CSS Transforms - they are super cool, however they look a little like this:</p>
+					<p>Now I recently did this and did some stuff with variables _but_ we are still in string land. If I change any of those with js and reset them - say I want to change the scale, I have to remember to add all of them together.</p>
+					<p>Each of those transform types is a type in typed om which you can create, and so is the transform itself.</p>
+					<p>One down, four to go</p>
+				</aside>
+			</section>
+
+			<section class="pink" data-state="pink">
+				<h1 class="pink">Properties & Values</h1>
+				<h2>Custom Properties</h2>
+
+				<aside class="notes">
+					<p>So Typed OM is cool, but it might seem a little strange to start, and a _lot_. Sometimes you just want to add styles, or you have classList and you can toggle now and that's ok. Be careful of performance. But the real thing with Typed OM is how it underpins all the other APIs.</p>
+					<p>This is easily seen with properties & values. We've all seen css variables - I'm using them for the button:</p>
+				</aside>
+			</section>
+
+			<section class="pink" data-state="getMain">
+				<pre><code data-trim data-noescape>button {
+	--mainColour: blue;
+	background-color: --mainColour;
+}</code></pre>
+				<aside class="notes">
+					<p>So I have always struggled with the term CSS variables and I won't fight with people over this because I have better things to do with my life, but when you set a variable in a program you write, to update that variable, you reset it further in your code.</p>
+				</aside>
+			</section>
+
+			<section class="pink">
+				<button class="button">Click Me</button>
+				<pre><code data-trim data-noescape>buttonEl.style.setProperty("--mainColour", "pink")</code></pre>
+				<aside class="notes">
+					<p>In CSS, for ages now, we've had the ability to update custom properties (aka css variables) in javascript in real time - like this - set data, changes in js raf</p>
+					<p>This is how I'm changing the colour of the button in this talk. It's the same as the backgrounds - they're all running from this mainColour property, which I update for every section - but this is not properties and values just yet. And you may notice it's a little more complicated with the button because I'm using a gradient:</p>
+					<!-- <p>Properties and values is sort of an extension of this - think back to typed om - this is cool, but there's no typing - we're still using strings. What if, you could register a custom property, with the value being typed</p> -->
+				</aside>
+			</section>
+
+			<section class="pink">
+				<button class="button">Click Me</button>
+				<pre><code data-trim data-noescape>background-image:
+	linear-gradient(180deg, var(--mainColour), var(--lighterMain))
+;</code></pre>
+				<aside class="notes">
+					<p>Now this can get a little bit annoying - because now I have to list all the different colours in the talk, purple, blue, pink & their relative lighter versions - I'm not using any preprocessors, like sass, so I have no access to any colour functions like lighter - which may or may not be coming into spec</p>
+					<p>So let's use houdini to polyfill and generate a lighter colour</p>
+				</aside>
+			</section>
+
+			<section class="pink">
+				<pre><code data-trim data-noescape data-line-numbers="1">const mainColour = revealOuter.attributeStyleMap.get("--mainColour");
+
+// split string into dif vals & add more to lum
+const splitCol = colFromHsla(mainColour[0]);
+splitCol.lum = splitCol.lum+10;
+
+// lighter col string
+const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${splitCol.op})`;</code></pre>
+				<aside class="notes">
+					<p>First of all let's use javascript to generate a lighter colour - now remember we don't have a colour type in typed om yet - when we do this _will_ be easier.</p>
+					<p>typed om attristylemap to get our main colour</p>
+				</aside>
+			</section>
+
+			<section class="pink">
+				<pre><code data-trim data-noescape data-line-numbers="3-5">const mainColour = revealOuter.attributeStyleMap.get("--mainColour");
+
+// split string into dif vals & add more to lum
+const splitCol = colFromHsla(mainColour[0]);
+splitCol.lum = splitCol.lum+10;
+
+// lighter col string
+const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${splitCol.op})`;</code></pre>
+				<aside class="notes">
+					<p>I'm running a function here to split the hsla string to hue, sat, lum & op vals</p>
+					<p>It's worth mentioning, when we get CSSColourVals in Typed OM I won't need to do this and my life will be amazing and wow.</p>
+					<p>Now I can use props and vals & register this new colour as a custom property - this is the properties and values api.</p>
+				</aside>
+			</section>
+
+			<section class="pink">
+				<pre><code data-trim data-noescape data-line-numbers="7-8">const mainColour = revealOuter.attributeStyleMap.get("--mainColour");
+
+// split string into dif vals & add more to lum
+const splitCol = colFromHsla(mainColour[0]);
+splitCol.lum = splitCol.lum+10;
+
+// lighter col string
+const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${splitCol.op})`;</code></pre>
+				<aside class="notes">
+					<p>Then I'm putting the string back together</p>
+					<p>Now, now I can use props and vals & register this new colour as a custom property - this is the properties and values api.</p>
+				</aside>
+			</section>
+
+			<section class="pink">
+				<pre><code data-trim data-noescape>CSS.registerProperty({
+  name: '--lighterMain',
+  syntax: '&lt;color>',
+  inherits: true,
+  initialValue: lighterCol
+});</code></pre>
+
+				<aside class="notes">
+					<p>We use the registerProperty method, we define a name - we have to do this and give it the dash dash</p>
+					<p>Syntax is the type, and this sort of matches up with typed om, that's whats underneath the hood</p>
+					<p>Inherits is set to false by default, this means elements further down the dom tree don't have access to it - or rather the value - unles we se that to true</p>
+					<p>Then we have the initial value, now we have to be pretty explicit with this. If you're defining the unit, the initial value needs the unit.</p>
+				</aside>
+			</section>
+
+			<section class="pink" data-state="pink">
+				<h1>TYPES</h1>
+				<h2>Animatable</h2>
+				<aside class="notes">
+					<p>Types are related to Typed OM - there will be all eventually</p>
+					<p>You can use a * - which is anything - a bit like CSSStyleValue </p>
+				</aside>
+			</section>
+
+			<section class="purple" data-state="purple">
+				<h1 class="purple">Workers & Worklets</h1>
+				<aside class="notes">
+					<p>ASIDE - before I move on I just want to break, aside for just a moment to mention workers and worklets.</p>
+					<p>Workers in javascript mean running a script off the main thread, you have your javascript file, you register it as a worker and you can send messgaes (data) to and from it from your main script or main thread and it runs off the main thread - yes we're all ok good</p>
+					<p>A worklet is also running off the main thread, but it is a predefined class, with built in props and methods exposed (api) - again you register and make.</p>
+					<p>Cool ok I can move on</p>
+				</aside>
+			</section>
+
+			<section class="green" data-state="green">
+				<h1 class="green">CSS Paint API</h1>
+				<h2>🎨</h2>
+				<aside class="notes">
+					<p>Allows us to register a paint worklet (see what I did there) in js, for use whereever we might want to use an image in our css - so backgrounds, borders, image masking - now you might think - we have images, but, my class, we can draw it. This means resizing, no downloading. The worklet harnesses the canvas api. let me show you.</p>
+				</aside>
+			</section>
+
+			<section class="green">
+				<pre><code data-trim data-noescape>.slide {
+	background-image: paint(dots);
+}</code></pre>
+<pre><code data-trim data-noescape>CSS.paintWorklet.addModule('dots.js');</code></pre>
+				<aside class="notes">
+					<p>The backgrounds you have seen all the way through this talk, have been using the paint api - and actually, if I refresh this page, it should change colour.</p>
+					<p>If I resize the window, the highlight will change too. THis is how you do it. You register the paint worklet in your main script, you create this worklet. Then you call it within your css, where you would use an image in your css.</p>
+				</aside>
+			</section>
+
+			<section class="green" data-state="green">
+				<h1>Show Paint Worklet</h1>
+				<aside class="notes">
+					<p>Which is your worklet.</p>
+					<p>Function pass in name and class</p>
+					<p>Automatically registered as a paint worklet class</p>
+					<p>that gives you dimensions, any custom properties which are affecting the element. And in there you can use the canvas api to draw whatever you want as your _image_</p>
+					<p>CUSTOM ARGUMENTS</p>
+					<p>Paint worklet - this is the class</p>
+				</aside>
+			</section>
+
+			<section class="orange" data-state="orange">
+				<h1 class="orange">Layout API</h1>
+				<h2>Works much like CSS Paint</h2>
+
+				<aside class="notes">
+					<p>OK these last two I don't have any demos for, they are the least supported and we don't have too much time left</p>
+					<p>Layout API, works much like CSS Paint in that you register a layout worklet, and that gives you access to layout features of an element and it's child elements.</p>
+				</aside>
+			</section>
+
+			<section class="orange">
+				<pre><code data-trim data-noescape>.slide {
+	display: layout(coolLayout);
+}</code></pre>
+<pre><code data-trim data-noescape>CSS.layoutWorklet.addModule('myCoolLayout.js');</code></pre>
+				<aside class="notes">
+					<p>You use the layout function, where you reference your registered layout worklet, as a value for the display property</p>
+					<p>Inside the registerLayout worklet you get access to children, edges, constraints, the Typed OM style map, that's enough to do clever maths of positioning things.</p>
+				</aside>
+			</section>
+
+			<section class="orange" data-state="orange">
+				<h1 class="orange">Animation Worklet</h1>
+				<h2></h2>
+
+				<aside class="notes">
+					<p>There's a lot of worklets all of a sudden isn't there! This one works a little differently than before</p>
+					<p>We set it up as usual, but we need both keyframes, which is our actual animation, and a timeline. Both of which are </p>
+				</aside>
+			</section>
+
+			<section class="purple" data-state="purple">
+				<h1 class="purple">CSS Houdini</h1>
+				<h2>🧚🏻‍♀️</h2>
+				<aside class="notes">
+					<p>Well done class! There will be more about layout and animation in version two of this class, which will probably end up being a workshop actually.</p>
+				</aside>
+			</section>
+
+			<section class="purple" data-state="purple">
+				<h1 class="purple">Resources</h1>
+				<h3>Check my twitter&nbsp;&nbsp;|&nbsp;&nbsp;@rumyra</h3>
+				<h3 class="fragment">@snugug</h3>
+				<h3 class="fragment">@una</h3>
+				<h3 class="fragment">@surma</h3>
+				<h3 class="fragment">@tabatkins</h3>
+				<aside class="notes">
+					<p>Well done class! There will be more about layout and animation in version two of this class, which will probably end up being a workshop actually.</p>
+					<p>Check out my twitter after this, I've got a list of articles & demos which you can refer to.</p>
+					<p>Follow the following people because they are awesome:</p>
+				</aside>
+			</section>
+
+			<section class="dark" data-background-color="hsla(315, 3%, 25%, 1)">
+				<h1>Thank You</h1>
+				<h2>Ruth John&nbsp;&nbsp;|&nbsp;&nbsp;@rumyra</h2>
+				<aside class="notes">
+					<p>And y'all thought this was about audio huh :D</p>
+					<p>Ask me questions</p>
+					<p>Thank you very much for inviting me here and making me do a _serious_ talk Bruce, Gabi. I'll see you at the next one.</p>
+				</aside>
+			</section>
+		</div><!--slides-->
+
+
+	</div><!--.reveal-->
+
+
+	<!-- TALK ++++++++++++++++++++++++++++++++ -->
+
+	<script type="text/javascript" src="reveal.js-3.8.0/js/reveal.js"></script>
+	<script type="text/javascript" src="revealInit.js"></script>
+	<script type="text/javascript" src="index.js"></script>
+</body>
+</html>
