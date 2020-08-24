@@ -25,6 +25,7 @@ There are recordings of the talk
 - [Typed OM](https://developers.google.com/web/updates/2018/03/cssom)
 - [CSS Paint](https://css-tricks.com/the-css-paint-api/)
 - [Properties & Values in depth](https://bobrov.dev/blog/css-custom-properties-in-depth/)
+- [Animation Worklet](https://developers.google.com/web/updates/2018/10/animation-worklet)
 
 ## Slides
 

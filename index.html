@@ -30,21 +30,22 @@
 			display: block; margin: 0 auto;
 			padding: var(--unit) calc(var(--unit)*2);
 			width: calc(30% + 20px);
-			background: var(--mainColour) linear-gradient(180deg, var(--mainColour), var(--lighterMain)) no-repeat left top;
+			background: transparent linear-gradient(180deg, transparent, white) no-repeat top left;
 			background-position: 0% 0%;
-			border: 4px solid var(--mainColour);
+			border: none;
+			border-top: 4px solid var(--mainColour);
 			border-radius: 2px;
 
-			font-size: calc(var(--unit)*2); color: var(--white);
+			font-size: calc(var(--unit)*2); color: var(--mainColour);
 			/*font-family: "zillaslab", serif;*/
 
 			cursor: pointer;
 			transform: scale(0.95);
 		}
 
-		.button:hover {
-			background: var(--white) linear-gradient(180deg, transparent, transparent) no-repeat top left;
-			color: var(--mainColour);
+		.hover .button {
+			background: var(--mainColour) linear-gradient(180deg, var(--mainColour), var(--lighterMain)) no-repeat left top;
+			color: white;
 			border-color: var(--mainColour);
 			transform: scale(1);
 		}
@@ -58,7 +59,7 @@
 	<div class="reveal">
 		<div class="slides">
 			<section class="dark" data-background-color="hsla(315, 3%, 25%, 1)">
-				<h1>CSS Houdini</h1>
+				<h1>Escape the box with Houdini</h1>
 				<h2>Ruth John&nbsp;&nbsp;|&nbsp;&nbsp;@rumyra</h2>
 			</section>
 
@@ -79,7 +80,9 @@
 				<h2>🧚🏻‍♀️&nbsp;✨</h2>
 
 				<aside class="notes">
-					<p>So today, we're going to have a lesson on CSS Houdini. Back in the spring I helped write some demos for MDN docs, so I'm going to share with you what I learnt whilst doing this.</p>
+					<p>This is an introductory talk to what's involved with houdini</p>
+					<p>So today, we're going to have a lesson on CSS Houdini. Back last year I helped write some demos for MDN docs</p>
+					<p>I'm going to share with you what I learnt whilst doing this.</p>
 				</aside>
 			</section>
 
@@ -89,7 +92,7 @@
 				<h2 class="fragment">Extend CSS through JS</h2>
 
 				<aside class="notes">
-					<p>Houdini is basically just a buzz word. Someone came up with it and it stuck, because there's a whole bunch of apis that are being drafted and written, which allow us as developers better access to CSS, through javascript, an Houdini is the word that describes all of them together</p>
+					<p>🚨 Houdini is basically just a buzz word. Someone came up with it and it stuck, because there's a whole bunch of apis that are being drafted and written, which allow us as developers better access to CSS, through javascript. Houdini is just the word that describes all of them together 🚨</p>
 					<p>At the moment, if a new feature comes out in CSS, say conic gradient, as we see with new features, it may take some time for those features to be implemented by browsers, polyfills as they stand are cumbersome and unperformant, and so Houdini looks to solve this problem.</p>
 					<p>It is not, and I say this strongly, a new shiny css thing we are going to polyfill.</p>
 					<p>Let's take a look at the api's currently under the suite of Houdini.</p>
@@ -108,17 +111,18 @@
 				</div>
 				<aside class="notes">
 					<p>So there's Typed OM, Pant API, Properties & Values, Layout API and Animation Worklet. This is what I'm going to be talking about today</p>
-					<p>Today I am going to deep dive into Typed OM and Paint, and discuss Properties & vlues, Layout and animation.</p>
-					<p>I'll show you why</p>
-					<p>So let's start from the top - with probably what I deem to be the most important - Typed OM.</p>
+					<p>Today I am going to deep dive into Typed OM, Paint * properties & values. and discuss Layout and animation.</p>
+					<p>time & I'll show you why</p>
+					
 				</aside>
 			</section>
 
 			<section class="purple" data-state="purple">
+				<img src="ihry.jpg" />
 				<p><a data-preview-link href="https://ishoudinireadyyet.com/">https://ishoudinireadyyet.com/</a></p>
 				<aside class="notes">
 					<p>This is the support for CSS Houdini as it stands at the time of this talk.</p>
-					<p>I've omitted parser & font metrics</p>
+					<p>I've omitted parser & font metrics because they are red and there's no implememntation yet</p>
 					<p>Talk about each api</p>
 					<p>So let's start from the top - with probably what I deem to be the most important - Typed OM.</p>
 				</aside>
@@ -129,16 +133,17 @@
 				<h2>Access to CSS Values as types in JS</h2>
 
 				<aside class="notes">
+					<p>So let's start from the top - with probably what I deem to be the most important - Typed OM.</p>
 					<p>This pretty much underpins all the other APIs, standalone its very verbose and can seem cumbersome as I'm just about to take you through it</p>
-					<p>To sum it up</p>
-					<p>Now the easiest way for me to explain this is to shwo you how we access styles in js at the moment</p>
+					<p>To sum it up: Access to CSS values as types in javascript</p>
+					<p>Now the easiest way for me to explain this is to show you how we access styles in js at the moment</p>
 				</aside>
 			</section>
 
 			<section class="blue">
 				<button class="button">Click Me</button>
 				<pre><code data-trim data-noescape>button {
-	border-width: 4px;
+	border-width-top: 4px;
 }</code></pre>
 				<aside class="notes">
 					<p>Just a little bit of syntax before we move on. Selectors, properties, values.</p>
@@ -147,11 +152,14 @@
 
 			<section data-state="style" class="blue">
 				<button class="button">Click Me</button>
-				<pre><code data-trim data-noescape>const borderWidth = buttonEl.style.borderWidth; // "4px"
+				<pre><code data-trim data-noescape>const borderWidth = window.getComputedStyle(buttonEl).borderTopWidth; // "4px"
+
+// some string matching, testing & calculation...
 
 buttonEl.style.borderWidth = "2px";</code></pre>
 				<aside class="notes">
-					<p>I mean if we wanted to compute the new border value, we have to do some weird string thing where we count back from the string because there could be any number of numebrs at the beginning, and that's because we're sure it's pixels and not some other unit, like rem, and then we gotta do the math and string it bac together and it's 2020.</p>
+					<p>If we want to compute a new top border value with javascript, for whatever reason. As it stands this is how we access that value, and re add it to our button. To do the calculation we have to do some weird string thing where we count back from the string because there could be any number of numbers at the beginning, and that's because we're sure it's pixels and not some other unit, like rem,
+					<p>Extracting the number isn't easy.</p> <p>Then we gotta do the math and string it back together and it's 2020.</p>
 					<p>Wouldn't it be cool if we could do something like this:</p>
 				</aside>
 			</section>
@@ -162,107 +170,124 @@ buttonEl.style.borderWidth = "2px";</code></pre>
 
 const borderWidth = buttonEl.computedStyleMap().get('border-top-width');
 
-// Returns: value: 4, unit: "px"
+// Returns: {value: 4, unit: "px"}
+
+// So we can now do:
+const newWidth = borderWidth.value + 2; // gives us 6
 </code></pre>
 				<aside class="notes">
-					<p>And that returns an object with a value and a unit. And that value is a number.</p>
-					<p>computed style map returns all css</p>
-					<p>There's lots of these value types - this is the idea behind typed om, that eventually all values in css will have a type - this border width is a CSSUnitValue - there's lots...</p>
+					<p>This is a new method 'computedStyleMap' which you invoke on an element and it will return all the CSS styles available on that element.</p>
+					<p>With the get method you can specify one property, but the really good thing about this interface, is the value is returned as an object</p>
+					<p>An object containing the value and the unit. The value is numerical, so it's easy to use out the box.</p>
+					<p>The type of value that is returned is a CSSUnitValue.</p>
+				</aside>
+			</section>
+
+			<!-- different types and creating different types -->
+			<section class="lists blue">
+				<div class="list-left">
+					<ul>
+						<li><code>CSSStyleValue</code></li>
+						<li class="fragment"><code>CSSNumericValue</code></li>
+						<li class="fragment"><code>CSSUnitValue</code></li>
+						<li class="fragment"><code>CSSMathSum</code></li>
+					</ul>
+				</div>
+				<aside class="notes">
+					<p> This is a sub class of a parent type called 🚨 CSSNumericValue</p>
+					<p>CSSStyleValue is the parent class of all the different types</p>
+					<p>There's lots of these value types - this is the idea behind typed om, that eventually all values in css will have a type</p>
+					<p>As well as CSSUnitValue, we have CSSMathSum for when you use the calc function in CSS</p>
+					<!-- <p>These are the numeric values and they all work in a similar way to the CSS unit we have seen. Returning an object configured specifically for that type.</p> -->
 				</aside>
 			</section>
 
 			<section class="lists blue">
 				<div class="list-left">
 					<ul>
-						<li><code>CSSStyleValue</code></li>
-						<li class="fragment"><code>CSSKeywordValue</code></li>
-						<li class="fragment"><code>CSSNumericValue</code></li>
-						<li class="fragment"><code>CSSUnitValue</code></li>
-						<li class="fragment"><code>CSSMathSum</code></li>
 						<li class="fragment"><code>CSSTransformValue</code></li>
+						<li class="fragment"><code>CSSKeywordValue</code></li>
 						<li class="fragment"><code>CSSUnparsedValue</code></li>
-						<li class="fragment"><code>CSSVariableReferenceValue</code></li>
+						<li class="fragment"><code>CSSImageValue</code></li>
 					</ul>
 				</div>
 				<aside class="notes">
-					<p>CSSStyleValue is the parent class</p>
-					<p>keyword value so a word that's not a string, like inherit or auto, or block, inline</p>
-					<p>CSS Numeric value is the parent class for the unit value we just saw</p>
-					<p>CSS Unit value we just saw</p>
-					<p>CSS math sum is for when you use calc (min max) in css</p>
-					<p>transform</p>
-					<p>unparsed - variables and variablereference is for creating variable values</p>
-					<p>There's going to be more - css image value, css colour value</p>
+					<p>As well as our numeric values, there are a number of others:</p>
+					<p>transform value, this is for any values we would use in the transform property: translate, rotate, skew...</p>
+					<p>keyword value so a word that's not a incased in quotes like a string. So inherit or auto, or block, inline</p>
+					<p>unparsed - values that aren't known, like when we declare custom properties.<p>CSSImageValue is a type for where you would use an image, background, border, mask. But can be an actual image or a gradient or custom paint, so is intentionally opache at this time.</p>
+					<p>There's going to be more - css colour value</p>
 				</aside>
 			</section>
 
+			<section class="blue">
+				<pre><code data-trim data-noescape>button {transform: rotate(30deg);}
+				
+// Returns: {
+//	angle: {value: 30, unit: "deg"},
+//	is2D: true
+//}				
+				</code></pre>
+				<aside class="notes">
+					<p>All these different value types return an object similarly to what we've seen with unit value.</p>
+					<p>For instance a rotate value would look a little something like this:</p>
+				</aside>
+			</section>
+
+			<!-- how do we create a value -->
 			<section data-state="make" class="blue">
 				<button class="button" id="butt">Click Me</button>
 				<pre><code data-trim data-noescape>new CSSUnitValue(10, px);
 
 CSS.px(10);
 
-buttonEl.attributeStyleMap().set('border-top-width', CSS.px(10));
+// both create {value: 10, unit: "px"}
 </code></pre>
 				<aside class="notes">
-					<p>So we've seen how we get a CSS value affecting an element, but how to we set it.</p>
+					<p>So we've seen how we get a CSS value affecting an element, and the different types of values we could receive. How do we create one, and then set it?</p>
 					<p>We create the CSSStyleValue</p>
-					<p>Couple of ways - we can use the class constructor new - or the easier factory method of CSS.px (units)</p>
-					<p>we saw .style method earlier. In js as it stands at the moment we set values on the style attribute - this doesn't change but we have access to that via the styleAttributeMap - we can get stuff just like we did before</p>
+					<p>Couple of ways - we can use the class constructor new - or (if it's a CSSUnitValue) the easier factory method of CSS.px (units)</p>
 				</aside>
 			</section>
-
+			
+			<!-- how do we set an attribute -->
 			<section class="blue">
 				<button class="button" id="butt">Click Me</button>
-				<pre><code data-trim data-noescape>buttonEl.attributeStyleMap().get('border-top-width') // returns CSSUnitValue
+				<pre><code data-trim data-noescape>buttonEl.attributeStyleMap().set('border-top-width', CSS.px(10));
 
 buttonEl.attributeStyleMap.has('border-top-width') // returns true
 
 buttonEl.attributeStyleMap.delete('border-top-width') // removes from attribute styles
 
 buttonEl.attributeStyleMap.clear() // removes all attribute styles
+
+buttonEl.attributeStyleMap().get('border-top-width') // returns CSSUnitValue
 </code></pre>
 				<aside class="notes">
+					<p>we saw .style method earlier. In js as it stands at the moment we set values on the style attribute - this doesn't change but we have access to that via the styleAttributeMap</p>
+					<p>This represents all the styles within the style attribute.</p>
+					<p>And we get a few more methods, </p>
 					<p>Couple of other methods on the sytleattrmap - get has delete clear</p>
 				</aside>
 			</section>
 
 			<section class="blue">
-				<h1>Numeric</h1>
-				<aside class="notes">
-					<p>Let's dive into some of the methods of the more complete types of the API</p>
-					<p>Numeric values</p>
-					<p>I'm not going to go into every single method, there's a lot going on. The CSS object comes with a whole bunch of stuff now.</p>
-					<p>I thought I would give you a sneaky peek of the docs, which are being edited by the absolutely wonderful Estelle Wyle as we speak.</p>
-					<p>3 & 4</p>
-					<p>Calc function, so we can create CSSMathSum val - but not only that, we also have a bunch of methods which allow us to do maths on the CSSNumericTypes types.</p>
-				</aside>
-			</section>
+<pre><code data-trim data-noescape>let sum = CSS.px(54).add(CSS.px(30));
+// Returns: CSSUnitValue {value: 84, unit: "px"}
 
-			<section class="blue">
-				<h1>MathSum</h1>
-				<pre><code data-trim data-noescape>button {
-	width: calc( 20vw + 0.5em );
-}</code></pre>
-				<aside class="notes">
-					<p>Other parts of Typed OM which are pretty feature complete are maths and transforms</p>
-					<p>I'm not going to go into every single method, there's a lot going on. The CSS object comes with a whole bunch of stuff now.</p>
-					<p>I thought I would give you a sneaky peek of the docs, which are being edited by the absolutely wonderful Estelle Wyle as we speak.</p>
-					<p>3 & 4</p>
-					<p>Calc function, so we can create CSSMathSum val - but not only that, we also have a bunch of methods which allow us to do maths on the CSSNumericTypes types.</p>
-				</aside>
-			</section>
+const cm = CSS.in(2).to('cm');
+// Returns: CSSUnitValue {value: 5.08, unit: "cm"}
 
-			<section class="blue" data-state="blue">
-				<h1>Transform</h1>
-				<pre><code data-trim data-noescape>button {
-	transform: translateX(10px) rotate(45deg) scale(0.5);
-}</code></pre>
+const fontSize = CSS.em(1.2);
+CSS.em(1.2).equals(fontSize); // true
+</code></pre>
 				<aside class="notes">
-					<p>CSS Transforms - they are super cool, however they look a little like this:</p>
-					<p>Now I recently did this and did some stuff with variables _but_ we are still in string land. If I change any of those with js and reset them - say I want to change the scale, I have to remember to add all of them together.</p>
-					<p>Each of those transform types is a type in typed om which you can create, and so is the transform itself.</p>
-					<p>One down, four to go</p>
+					<p>If you're working with numeric types there's a few methods to be aware of:</p>
+					<p>You can add subtract divide and multiply with methods.</p>
+					<p>You can convert units! there's a 'to' method. Only works on absolute units are this time, but still handy</p>
+					<p>There's an equals method for testing if two unit values are a match.</p>
+					<p>And these are just a few. It seemed a bit cumbersome before with all the value types right. But if we are getting this functionality for all our values in the future, it really changes how we power our styles with javascript.</p>
+
 				</aside>
 			</section>
 
@@ -271,7 +296,7 @@ buttonEl.attributeStyleMap.clear() // removes all attribute styles
 				<h2>Custom Properties</h2>
 
 				<aside class="notes">
-					<p>So Typed OM is cool, but it might seem a little strange to start, and a _lot_. Sometimes you just want to add styles, or you have classList and you can toggle now and that's ok. Be careful of performance. But the real thing with Typed OM is how it underpins all the other APIs.</p>
+					<p>So we know Typed OM is cool, but it might seem a little strange to start, and a _lot_. Sometimes you just want to add styles, or you have classList and you can toggle now and that's ok. Be careful of performance. But the real thing with Typed OM is how it underpins all the other APIs.</p>
 					<p>This is easily seen with properties & values. We've all seen css variables - I'm using them for the button:</p>
 				</aside>
 			</section>
@@ -283,6 +308,7 @@ buttonEl.attributeStyleMap.clear() // removes all attribute styles
 }</code></pre>
 				<aside class="notes">
 					<p>So I have always struggled with the term CSS variables and I won't fight with people over this because I have better things to do with my life, but when you set a variable in a program you write, to update that variable, you reset it further in your code.</p>
+					<p>Custom properties in CSS are live, I update them in my js and they update in real time: like this...</p>
 				</aside>
 			</section>
 
@@ -290,18 +316,18 @@ buttonEl.attributeStyleMap.clear() // removes all attribute styles
 				<button class="button">Click Me</button>
 				<pre><code data-trim data-noescape>buttonEl.style.setProperty("--mainColour", "pink")</code></pre>
 				<aside class="notes">
-					<p>In CSS, for ages now, we've had the ability to update custom properties (aka css variables) in javascript in real time - like this - set data, changes in js raf</p>
-					<p>This is how I'm changing the colour of the button in this talk. It's the same as the backgrounds - they're all running from this mainColour property, which I update for every section - but this is not properties and values just yet. And you may notice it's a little more complicated with the button because I'm using a gradient:</p>
+					<p>This is how I'm changing the colour of the button in this talk. It's the same as the backgrounds - they're all running from this mainColour property, which I update for every section - but this is not properties and values just yet. </p>
 					<!-- <p>Properties and values is sort of an extension of this - think back to typed om - this is cool, but there's no typing - we're still using strings. What if, you could register a custom property, with the value being typed</p> -->
 				</aside>
 			</section>
 
-			<section class="pink">
+			<section class="pink hover">
 				<button class="button">Click Me</button>
 				<pre><code data-trim data-noescape>background-image:
 	linear-gradient(180deg, var(--mainColour), var(--lighterMain))
 ;</code></pre>
 				<aside class="notes">
+					<p>The hover style for the button uses a background gradient</p>
 					<p>Now this can get a little bit annoying - because now I have to list all the different colours in the talk, purple, blue, pink & their relative lighter versions - I'm not using any preprocessors, like sass, so I have no access to any colour functions like lighter - which may or may not be coming into spec</p>
 					<p>So let's use houdini to polyfill and generate a lighter colour</p>
 				</aside>
@@ -366,6 +392,7 @@ const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${
 					<p>Syntax is the type, and this sort of matches up with typed om, that's whats underneath the hood</p>
 					<p>Inherits is set to false by default, this means elements further down the dom tree don't have access to it - or rather the value - unles we se that to true</p>
 					<p>Then we have the initial value, now we have to be pretty explicit with this. If you're defining the unit, the initial value needs the unit.</p>
+					<p>I didn't need to do all that in CSS, I have the power of javascript to do the colour changes.</p>
 				</aside>
 			</section>
 
@@ -374,7 +401,15 @@ const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${
 				<h2>Animatable</h2>
 				<aside class="notes">
 					<p>Types are related to Typed OM - there will be all eventually</p>
-					<p>You can use a * - which is anything - a bit like CSSStyleValue </p>
+					<p>They are animatable</p>
+				</aside>
+			</section>
+
+			<section class="pink" data-state="pink">
+				<h2>Ana Tudor<br />@thebabydino</h2>
+				<img src="ana.jpg" />
+				<aside class="notes">
+					<p>If you're interested in more, check out ana tudors work on codepen</p>
 				</aside>
 			</section>
 
@@ -383,7 +418,7 @@ const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${
 				<aside class="notes">
 					<p>ASIDE - before I move on I just want to break, aside for just a moment to mention workers and worklets.</p>
 					<p>Workers in javascript mean running a script off the main thread, you have your javascript file, you register it as a worker and you can send messgaes (data) to and from it from your main script or main thread and it runs off the main thread - yes we're all ok good</p>
-					<p>A worklet is also running off the main thread, but it is a predefined class, with built in props and methods exposed (api) - again you register and make.</p>
+					<p>A worklet is also running off the main thread, but it has a predefined class, with built in props and methods exposed (api) - again you register and make.</p>
 					<p>Cool ok I can move on</p>
 				</aside>
 			</section>
@@ -408,7 +443,19 @@ const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${
 			</section>
 
 			<section class="green" data-state="green">
-				<h1>Show Paint Worklet</h1>
+				<pre><code data-trim data-noescape>registerPaint('dots', class {
+
+	// use this function to retrieve any custom props defined for the element
+	static get inputProperties() { return ['--mainColour']; }
+
+	paint(ctx, size, props) {
+
+		// set colour
+		const colour = props.get('--mainColour');
+
+		// draw dots here - using html5 canvas api
+	}
+});</code></pre>
 				<aside class="notes">
 					<p>Which is your worklet.</p>
 					<p>Function pass in name and class</p>
@@ -419,12 +466,21 @@ const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${
 				</aside>
 			</section>
 
+			<section class="pink" data-state="pink">
+				<h2>Jeremy Wagner | @malchata</h2>
+				<h2><a href="https://paintlets.herokuapp.com/">https://paintlets.herokuapp.com/</a></h2>
+				<img src="jeremy.jpg" />
+				<aside class="notes">
+					<p>If you're interested in more, Jeremy Wagner has a great site showcasing some paint worklets he has put together</p>
+				</aside>
+			</section>
+
 			<section class="orange" data-state="orange">
 				<h1 class="orange">Layout API</h1>
 				<h2>Works much like CSS Paint</h2>
 
 				<aside class="notes">
-					<p>OK these last two I don't have any demos for, they are the least supported and we don't have too much time left</p>
+					<p>OK these last two I don't have any demos for, they are the least supported and we don't have too much time left, but worth a mention</p>
 					<p>Layout API, works much like CSS Paint in that you register a layout worklet, and that gives you access to layout features of an element and it's child elements.</p>
 				</aside>
 			</section>
@@ -446,7 +502,7 @@ const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${
 
 				<aside class="notes">
 					<p>There's a lot of worklets all of a sudden isn't there! This one works a little differently than before</p>
-					<p>We set it up as usual, but we need both keyframes, which is our actual animation, and a timeline. Both of which are </p>
+					<p>We set it up as usual, but we need both keyframes, which is our actual animation, and a timeline.</p>
 				</aside>
 			</section>
 
@@ -461,10 +517,6 @@ const lighterCol = `hsla(${splitCol.hue}, ${splitCol.sat}%, ${splitCol.lum}%, ${
 			<section class="purple" data-state="purple">
 				<h1 class="purple">Resources</h1>
 				<h3>Check my twitter&nbsp;&nbsp;|&nbsp;&nbsp;@rumyra</h3>
-				<h3 class="fragment">@snugug</h3>
-				<h3 class="fragment">@una</h3>
-				<h3 class="fragment">@surma</h3>
-				<h3 class="fragment">@tabatkins</h3>
 				<aside class="notes">
 					<p>Well done class! There will be more about layout and animation in version two of this class, which will probably end up being a workshop actually.</p>
 					<p>Check out my twitter after this, I've got a list of articles & demos which you can refer to.</p>
