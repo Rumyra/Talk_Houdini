@@ -1,22 +1,22 @@
 # CSS Houdini: The magic of CSS and JavaScript
 
-A talk about CSS Houdini
+A talk about CSS Houdini: A suite of APIs to give us better control over CSS.
 
 ## About
 
 How do you make a website? Me? I follow second star to the right and straight on til morning. Using everything I have learnt of course. But sometimes more fairy dust is necessary.
 
-Enter a whole suite of API's that will help navigate these skies. The speaker with talk you through what they are, where you can find them and of course how to use them. This is a time of stranger things, this is CSS Houdini.
+Enter a whole suite of API's that will help navigate these skies. I'll talk you through what they are, where you can find them and of course how to use them. This is a time of stranger things, this is CSS Houdini.
 
 Versions of this talk have been seen at:
 
-- []()
+- [JSCamp Bucharest, Sept 2019](https://tulu.la/events/jscamp-romania-romania-2019-0000xi)
 
 ## Videos
 
-There are recordings of the talk
+There are recordings of the talk available below:
 
-- []()
+- [JSCamp Bucharest, Sept 2019](https://www.youtube.com/watch?time_continue=2&v=tTuOSN-hoo8&feature=emb_logo)
 
 ## Resources/Further Reading
 
@@ -31,10 +31,9 @@ There are recordings of the talk
 
 I don't upload my slides due to some problems I've had with copyright infringement (As in people taking my slides 😢).
 
-However, you can find all the slides within the talk in the [index file](https://github.com/Rumyra/Talk_Houdini/blob/master/index.html) within this build. It's just an HTML file so pretty easy to navigate - all my slide notes are there as well, within the markup.
+However, you can find all the slides within the talk in the [index file](https://github.com/Rumyra/Talk_Houdini/blob/master/index.html) within this build. It's just an HTML file so should be straight forward to navigate - all my slide notes are there as well, within the markup.
 
-For each conference I tag a version, so just check the tags for your conference (no two talks are the same).
-
+I just keep the latest version for this talk, so it might not be precisely what you saw as things develop over time.
 
 ## Get in touch
 
